@@ -1,70 +1,58 @@
+
+// 
+//
+#include "Windows.h"
+#include "Stringapiset.h"
+#include <cstring>
 #include <iostream>
-#include <string>
 
-int main() {
-	//                   1 234567890 1 2 34 5 6
-   // std::string str = u8"ㄱ가가나라마바사 이건 UTF-8 문자열 입니다";
+int main()
+{
+	//wchar_t strUnicode[256] = { 0, };
+	//char    strUTF8[256] = { 0, };
+	//strcpy_s(strUTF8, 256, "utf-8글자..");
+	//int nLen = MultiByteToWideChar(CP_UTF8, 0, strUTF8, strlen(strUTF8), NULL, NULL);
+	//MultiByteToWideChar(CP_UTF8, 0, strUTF8, strlen(strUTF8), strUnicode, nLen);
 
-	const char* str = u8"ㄱ마가나라마바사";
-	size_t count = 0;
-	size_t len = 0;
 
-	size_t Size = strlen(str);
+	//_wsetlocale(LC_ALL, L"korean");
 
-	while (count < Size) {
-		int char_size = 0;
+	char strUTF8[156] = u8"utd-8 text 테스트하기 안녀어어엉";
+	std::cout << strUTF8 << std::endl;
 
-		if ((str[count] & 0b11111000) == 0b11110000)
-		{
-			char_size = 4;
-			std::cout << u8"4byte" << std::endl;
+
+	wchar_t strUnicode[256] = { 0, };
+
+	// 코드 페이지 / 변환 유형 / 변환할 문자열 포인터 / 문자열의 크기 / 반환 문자열을 저장할 버퍼 포인터 / 버퍼의 크기. NULL일시 null문자를 포함한 버퍼 크기를 문자로 반환.
+	int nLen = MultiByteToWideChar(CP_UTF8, 0, strUTF8, strlen(strUTF8), NULL, NULL);
+	MultiByteToWideChar(CP_UTF8, 0, strUTF8, strlen(strUTF8), strUnicode, nLen);
+
+	//wprintf(strUnicode);
+	//std::cout << std::endl;
+
+
+	std::wstring wstr(strUnicode);
+	std::u16string u16_str2(wstr.begin(), wstr.end());
+
+
+	std::cout << strUnicode << std::endl;
+
+
+
+	//std::u16string u16_str = u"안녕하세용 모두에 코드에 오신 것을 환영합니다";
+	std::string jaum[] = { u8"ㄱ", u8"ㄲ", u8"ㄴ", u8"ㄷ", u8"ㄸ", u8"ㄹ", u8"ㅁ",
+						  u8"ㅂ", u8"ㅃ",u8"ㅅ", u8"ㅆ", u8"ㅇ", u8"ㅈ", u8"ㅉ",
+						  u8"ㅊ", u8"ㅋ",u8"ㅌ", u8"ㅍ", u8"ㅎ" };
+
+	for (char16_t c : u16_str2) {
+		// 유니코드 상에서 한글의 범위
+		if (!(0xAC00 <= c && c <= 0xD7A3)) {
+			continue;
 		}
-		else if ((str[count] & 0b11110000) == 0b11100000)
-		{
-			char_size = 3;
-			std::cout << u8"3byte 한글은 일단 여기" << std::endl;
+		// 한글은 AC00 부터 시작해서 한 초성당 총 0x24C 개 씩 있다.
+		int offset = c - 0xAC00;
+		int jaum_offset = offset / 0x24C;
+		std::cout << jaum[jaum_offset];
 
-			if ((str[count] & 0b11101010) == 0b11101010)
-				if ((str[count + 1] & 0b10110000) == 0b10110000)
-					if ((str[count + 2] & 0b10000000) == 0b10000000)
-						std::cout << u8"이건 '가' 이다!" << std::endl << std::endl;
-
-			if ((str[count] & 0b11110000) == 0b11100011)
-				if ((str[count + 1] | 0b10000000) == 0b10100000)
-					if ((str[count + 2] | 0b10000000) == 0b10000000)
-						std::cout << u8"이건 'ㄱ' 이다!" << std::endl << std::endl;
-		}
-		else if ((str[count] & 0b11100000) == 0b11000000)
-		{
-			char_size = 2;
-			std::cout << u8"2byte" << std::endl;
-		}
-		else if ((str[count] & 0b10000000) == 0b00000000)
-		{
-			char_size = 1;
-			std::cout << u8"1byte" << std::endl;
-		}
-		else
-		{
-			std::cout << u8"이상한 문자 발견!" << std::endl;
-			char_size = 1;
-		}
-
-		//std::cout << str.substr(i, char_size) << std::endl;
-
-		//int i = char_size;
-		int j = 0;
-		while (j < char_size)
-		{
-			std::cout << str[count + j];
-			j++;
-		}
-		std::cout << std::endl;
-
-
-		count += char_size;
-		len++;
 	}
-	std::cout << u8"문자열의 실제 길이 : " << len << std::endl;
-	std::cout << u8"문자열의 메모리상 길이 : " << Size << std::endl;
 }
